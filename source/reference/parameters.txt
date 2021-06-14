@@ -901,6 +901,44 @@ General Parameters
 
       :parameter:`connPoolMaxShardedConnsPerHost`
 
+.. parameter:: internalQueryForceClassicEngine
+
+   .. versionadded:: 5.0
+
+   *Type*: boolean
+
+   *Default*: false
+
+   |mongod-only|
+
+   If :parameter:`internalQueryForceClassicEngine` is ``false``:
+
+   - Enhanced query execution is enabled, which improves
+     query performance by separating query execution from query
+     planning.
+   
+   - Query plan :ref:`explain results
+     <explain-results-enhanced-execution>` have a different structure
+     and contain additional information about the enhanced execution
+     plan.
+
+   If :parameter:`internalQueryForceClassicEngine` is ``true``,
+   enhanced query execution is disabled.
+
+   For example, the following command sets
+   :parameter:`internalQueryForceClassicEngine` to ``true``:
+
+   .. code-block:: bash
+
+      mongod --setParameter internalQueryForceClassicEngine=true
+
+   You can also use the :dbcommand:`setParameter` command within the
+   :mongosh:`MongoDB Shell </>`:
+
+   .. code-block:: javascript
+
+      db.adminCommand( { setParameter: 1, internalQueryForceClassicEngine: true } )
+
 .. parameter:: shardedConnPoolIdleTimeoutMinutes
 
    .. versionadded:: 3.6.3

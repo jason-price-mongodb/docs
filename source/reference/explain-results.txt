@@ -19,6 +19,9 @@ query plans, MongoDB provides:
 
 - the :dbcommand:`explain` command.
 
+Explain Output Structure
+------------------------
+
 The ``explain`` results present the query plans as a tree of stages.
 
 .. code-block:: javascript
@@ -54,8 +57,183 @@ Stages are descriptive of the operation; e.g.
 
 - ``SHARDING_FILTER`` for filtering out orphan documents from shards
 
-Explain Output
---------------
+.. _explain-results-enhanced-execution:
+
+Explain Output for Enhanced Query Execution
+-------------------------------------------
+
+.. versionadded:: 5.0
+
+Enhanced query execution improves performance by separating query
+execution from query planning.
+
+Starting in MongoDB 5.0, if :parameter:`internalQueryForceClassicEngine`
+parameter is:
+
+- ``false``, enhanced query execution is enabled and the ``explain``
+  results have the structure shown in this section.
+
+- ``true``, enhanced query execution is disabled and the ``explain``
+  results have the structure shown in :ref:`explain-results-4.4` with
+  one exception: in MongoDB 5.0, ``plannerVersion`` is renamed
+  ``explainVersion`` and moved to the top section of the ``explain``
+  results as shown in this section.
+
+.. tabs::
+
+   tabs:
+
+      - id: unsharded
+        name: "Unsharded Collections"
+        content: |
+
+            .. code-block:: none
+
+               "explainVersion" : <string>, // Starting in MongoDB 5.0
+               "queryPlanner" : {
+                  ...
+                  "winningPlan" : {
+                     "queryPlan" : {
+                        "stage" : <STAGE1>,
+                        "planNodeId" : <int>, // Starting in MongoDB 5.0
+                        ...
+                     },
+                     "slotBasedPlan" : { // Starting in MongoDB 5.0
+                        "slots" : <string>, // Starting in MongoDB 5.0
+                        "stages" : <string> // Starting in MongoDB 5.0
+                     }
+                  },
+                  ...
+               },
+               "executionStats" : {
+                  ...
+                  "executionStages" : {
+                     ...
+                     "inputStage" : {
+                        "stage" : <STAGE2>,
+                        "planNodeId" : <int>, // Starting in MongoDB 5.0
+                        ...
+                        "inputStage" : {
+                           "stage" : <STAGE3>,
+                           "planNodeId" : <int>, // Starting in MongoDB 5.0
+                           ...
+                           "outerStage" : {
+                              "stage" : <STAGE4>,
+                              "planNodeId" : <int>, // Starting in MongoDB 5.0
+                              ...
+                           },
+                           ...
+                        },
+                        ...
+                     }
+                  }
+               }
+
+      - id: sharded
+        name: "Sharded Collections"
+        content: |
+
+            .. code-block:: none
+
+               "queryPlanner" : {
+                  ...
+                  "winningPlan" : {
+                     "stage" : <STAGE1>,
+                     "shards" : [
+                        {
+                           ...
+                           "winningPlan" : {
+                              "queryPlan" : {
+                                 "stage" : <STAGE2>,
+                                 "planNodeId" : <int>, // Starting in MongoDB 5.0
+                                 ...
+                              },
+                              "slotBasedPlan" : { // Starting in MongoDB 5.0
+                                 "slots" : <string>, // Starting in MongoDB 5.0
+                                 "stages" : <string> // Starting in MongoDB 5.0
+                              },
+                              ...
+                           },
+                           ...
+                        },
+                        ...
+                     ]
+                  }
+               },
+               "executionStats" : {
+                  ...
+                  "executionStages" : {
+                     "stage" : <STAGE1>,
+                     ...
+                     "shards" : [
+                        {
+                           ...
+                           "executionStages" : {
+                              "stage" : <STAGE2>,
+                              "planNodeId" : <int>, // Starting in MongoDB 5.0
+                              ...
+                              "inputStage" : {
+                                 "stage" : <STAGE3>,
+                                 "planNodeId" : <int>, // Starting in MongoDB 5.0
+                                 ...
+                                 "inputStage" : {
+                                    "stage" : <STAGE4>,
+                                    "planNodeId" : <int>, // Starting in MongoDB 5.0
+                                    ...
+                                 },
+                                 ...
+                              },
+                              ...
+                           }
+                        }
+                     ]
+                  }
+               }
+
+.. data:: explain.explainVersion
+
+   Integer field with the explain planner version.
+
+   .. versionadded:: 5.0
+
+.. data:: explain.queryPlanner.winningPlan.queryPlan.planNodeId
+
+   Unique integer field that identifies each stage in the execution
+   plan. Field is included in all stages throughout the ``explain``
+   results.
+
+   .. versionadded:: 5.0
+
+.. data:: explain.queryPlanner.winningPlan.slotBasedPlan
+
+   Document with information about the enhanced query execution plan
+   tree and stages.
+
+   .. versionadded:: 5.0
+
+   .. data:: explain.queryPlanner.winningPlan.slotBasedPlan.slots
+
+      String with information about the enhanced query execution plan
+      tree.
+
+      .. versionadded:: 5.0
+
+   .. data:: explain.queryPlanner.winningPlan.slotBasedPlan.stages
+
+      String with information about the enhanced query execution plan
+      stages.
+
+      .. versionadded:: 5.0
+
+.. data:: explain.executionStats
+
+   Document with statistics that describe the completed query execution
+   for the winning plan.
+
+.. _explain-results-4.4:
+
+Explain Output for MongoDB 4.4 and Earlier
+------------------------------------------
 
 The following sections presents a list of some key fields returned by
 the ``explain`` operation.
@@ -107,7 +285,6 @@ the :doc:`query optimizer </core/query-plans>`.
                         "inputStage" : {
                            ...
                         }
-                     }
                   },
                   "rejectedPlans" : [
                      <candidate plan 1>,
