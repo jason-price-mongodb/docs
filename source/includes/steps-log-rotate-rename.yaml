@@ -25,8 +25,11 @@ stepnum: 3
 ref: rotate-log
 title: Rotate the log file.
 pre: |
-  Rotate the log file by issuing the :dbcommand:`logRotate` command
-  from the ``admin`` database in a :binary:`~bin.mongo` shell:
+  Rotate the log files by issuing the :dbcommand:`logRotate` command
+  from the ``admin`` database in a :binary:`~bin.mongo` shell. The
+  following example uses ``1`` to rotate all the log files (for the list
+  of other options and what each option does, see
+  :dbcommand:`logRotate`):
 action:
   language: sh
   code: |

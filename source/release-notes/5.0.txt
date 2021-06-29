@@ -320,15 +320,33 @@ Transactions
 General Improvements
 --------------------
 
-Audit Events
-~~~~~~~~~~~~
+Auditing
+~~~~~~~~
 
-Starting in MongoDB 5.0, ``startup`` and ``logout`` audit action types 
-are available in 
-:doc:`System Event Audit Messages </reference/audit-message>`.
+Starting in MongoDB 5.0:
 
-The ``dropCollection`` audit action type (``atype``) adds an audit
-event when a :ref:`view <3.4-reference-views>` is dropped. 
+- :ref:`System event auditing <audit-message-format>` has:
+
+  - An additional :ref:`uuid <audit-message-uuid>` field and other
+    :ref:`audit message <audit-message-format>` enhancements.
+
+  - New audit message types: :ref:`clientMetadata
+    <audit-message-clientMetadata>`, :ref:`directAuthMutation
+    <audit-message-directAuthMutation>`, :ref:`logout
+    <audit-message-logout>`, and :ref:`startup <audit-message-startup>`.
+
+  - Additional information and logging scenarios for these existing
+    audit message types: :ref:`authCheck <audit-message-authCheck>`,
+    :ref:`authenticate <audit-message-authenticate>`,
+    :ref:`createCollection <audit-message-createCollection>`,
+    :ref:`createIndex <audit-message-createIndex>`, and
+    :ref:`dropCollection <audit-message-dropCollection>`.
+
+- :dbcommand:`logRotate` has new options to rotate the audit logs
+  separately.
+
+- DDL operations auditing on :term:`secondaries <secondary>` has
+  changes. See :ref:`auditing-audit-events-and-filter`.
 
 ``mongosShutdownTimeoutMillisForSignaledShutdown`` Parameter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

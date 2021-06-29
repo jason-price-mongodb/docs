@@ -13,6 +13,8 @@ logRotate
 Definition
 ----------
 
+.. versionchanged:: 5.0
+
 .. dbcommand:: logRotate
 
    The :dbcommand:`logRotate` command is an administrative command that
@@ -23,11 +25,21 @@ Definition
    :dbcommand:`logRotate` command also rotates the audit log.
 
    You must issue the :dbcommand:`logRotate` command against the
-   :term:`admin database` in the form:
+   :term:`admin database` in one of these forms:
 
    .. code-block:: javascript
 
       { logRotate: 1 }
+      { logRotate: "server" }  // New in MongoDB 5.0
+      { logRotate: "audit" }  // New in MongoDB 5.0
+
+   ``1`` rotates all log files.
+
+   Starting in MongoDB 5.0:
+   
+   - ``"server"`` rotates the global server log file.
+
+   - ``"audit"`` rotates the audit log file.
 
    :dbcommand:`logRotate` takes an optional ``comment`` parameter which
    may be of any data type.
